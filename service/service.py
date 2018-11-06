@@ -15,8 +15,8 @@ logger = logging.getLogger('service')
 source_property = os.environ.get("SOURCE_PROPERTY", "wkt")
 target_property = os.environ.get("TARGET_PROPERTY", "geojson")
 zone_number = int(os.environ.get("ZONE_NUMBER", "33"))
-northern = bool(os.environ.get("NORTHERN", "true"))
-strict = bool(os.environ.get("STRICT_UTM_TO_LATLON", "false"))
+northern = json.loads(os.environ.get("NORTHERN", "true").lower())
+strict = json.loads(os.environ.get("STRICT_UTM_TO_LATLON", "false").lower())
 
 
 def utm_to_latlon(easting, northing):
