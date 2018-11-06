@@ -26,9 +26,12 @@ def utm_to_latlon(easting, northing):
 def transform(entity):
     wkt_3d = entity.get(source_property)
     if wkt_3d:
-        utm_3d = loads(wkt_3d)
-        latlon_2d = LineString([utm_to_latlon(xy[0], xy[1]) for xy in list(utm_3d.coords)])
-        entity[target_property] = json.loads(dumps(latlon_2d))
+        try:
+            utm_3d = loads(wkt_3d)
+            latlon_2d = LineString([utm_to_latlon(xy[0], xy[1]) for xy in list(utm_3d.coords)])
+            entity[target_property] = json.loads(dumps(latlon_2d))
+        except utm.OutOfRangeError as e:
+            logger.warning("Failed to convert entity '%s': %s", entity.get("_id"), e)
     return entity
 
 
