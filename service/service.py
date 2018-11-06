@@ -16,10 +16,11 @@ source_property = os.environ.get("SOURCE_PROPERTY", "wkt")
 target_property = os.environ.get("TARGET_PROPERTY", "geojson")
 zone_number = int(os.environ.get("ZONE_NUMBER", "33"))
 northern = bool(os.environ.get("NORTHERN", "true"))
+strict = bool(os.environ.get("STRICT_UTM_TO_LATLON", "false"))
 
 
 def utm_to_latlon(easting, northing):
-    (lat, lon) = utm.to_latlon(easting, northing, zone_number=zone_number, northern=northern)
+    (lat, lon) = utm.to_latlon(easting, northing, zone_number=zone_number, northern=northern, strict=strict)
     return [lon, lat]
 
 
@@ -30,7 +31,7 @@ def transform(entity):
             utm_3d = loads(wkt_3d)
             latlon_2d = LineString([utm_to_latlon(xy[0], xy[1]) for xy in list(utm_3d.coords)])
             entity[target_property] = json.loads(dumps(latlon_2d))
-        except utm.OutOfRangeError as e:
+        except Exception as e:
             logger.warning("Failed to convert entity '%s': %s", entity.get("_id"), e)
     return entity
 
