@@ -19,14 +19,25 @@ zone_number = int(os.environ.get("ZONE_NUMBER", "33"))
 northern = json.loads(os.environ.get("NORTHERN", "true").lower())
 strict = json.loads(os.environ.get("STRICT_UTM_TO_LATLON", "false").lower())
 
+path = source_property.split(".")
+
 
 def utm_to_latlon(easting, northing):
     (lat, lon) = utm.to_latlon(easting, northing, zone_number=zone_number, northern=northern, strict=strict)
     return [lon, lat]
 
 
+def resolve(entity):
+    value = entity
+    for p in path:
+        value = value.get(p)
+        if value is None:
+            return
+    return value
+
+
 def transform(entity):
-    wkt_3d = entity.get(source_property)
+    wkt_3d = resolve(entity)
     if wkt_3d:
         try:
             entity[target_property] = convert(wkt_3d)
